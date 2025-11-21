@@ -317,7 +317,8 @@ function App() {
                 type="number"
                 min="0"
                 inputMode="numeric"
-                value={item.count}
+                placeholder=""
+                value={item.count === 0 ? '' : item.count}
                 onChange={(event) =>
                   handleManualChange(item.id, event.target.value)
                 }
