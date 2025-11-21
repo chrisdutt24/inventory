@@ -134,22 +134,23 @@ function App() {
     setNewItemCount('1')
   }
 
-  const updateItemCount = (itemId, nextValue) => {
+  const updateItemCount = (itemId, nextValue, { removeIfZero = false } = {}) => {
     const safeValue = normalizeCount(nextValue)
 
     setLists((prev) =>
-      prev.map((list) =>
-        list.id === activeListId
-          ? {
-              ...list,
-              items: list.items
-                .map((item) =>
-                  item.id === itemId ? { ...item, count: safeValue } : item,
-                )
-                .filter((item) => item.count > 0),
-            }
-          : list,
-      ),
+      prev.map((list) => {
+        if (list.id !== activeListId) return list
+
+        const changed = list.items.map((item) =>
+          item.id === itemId ? { ...item, count: safeValue } : item,
+        )
+
+        const nextItems = removeIfZero
+          ? changed.filter((item) => item.count > 0)
+          : changed
+
+        return { ...list, items: nextItems }
+      }),
     )
   }
 
@@ -158,12 +159,15 @@ function App() {
     const item = list?.items.find((entry) => entry.id === itemId)
     if (!item) return
 
-    updateItemCount(itemId, item.count - 1)
+    const nextValue = Math.max(0, item.count - 1)
+    updateItemCount(itemId, nextValue, { removeIfZero: true })
   }
 
   const handleManualChange = (itemId, rawValue) => {
     const parsed = parseInt(rawValue, 10)
-    updateItemCount(itemId, Number.isNaN(parsed) ? 0 : parsed)
+    updateItemCount(itemId, Number.isNaN(parsed) ? 0 : parsed, {
+      removeIfZero: false,
+    })
   }
 
   if (!activeList) {
