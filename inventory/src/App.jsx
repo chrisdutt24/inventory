@@ -107,6 +107,21 @@ function App() {
     )
   }
 
+  const handleDeleteList = (id) => {
+    const list = lists.find((entry) => entry.id === id)
+    if (!list) return
+
+    const confirmed = window.confirm(
+      `Bereich "${list.name}" wirklich löschen? Die enthaltenen Gegenstände gehen verloren.`,
+    )
+    if (!confirmed) return
+
+    setLists((prev) => prev.filter((entry) => entry.id !== id))
+    if (activeListId === id) {
+      setActiveListId(null)
+    }
+  }
+
   const handleAddItem = (event) => {
     event.preventDefault()
     if (!activeList) return
@@ -224,6 +239,15 @@ function App() {
                 >
                   Umbenennen
                 </button>
+                <button
+                  className="ghost"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    handleDeleteList(list.id)
+                  }}
+                >
+                  Löschen
+                </button>
               </div>
             </button>
           ))}
@@ -259,6 +283,12 @@ function App() {
               onClick={() => handleRenameList(activeList.id)}
             >
               Umbenennen
+            </button>
+            <button
+              className="ghost"
+              onClick={() => handleDeleteList(activeList.id)}
+            >
+              Löschen
             </button>
             <button className="primary" onClick={handleAddList}>
               Neuer Bereich
