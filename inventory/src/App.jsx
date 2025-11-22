@@ -60,6 +60,7 @@ function App() {
   const [activeListId, setActiveListId] = useState(null)
   const [newItemName, setNewItemName] = useState('')
   const [newItemCount, setNewItemCount] = useState('1')
+  const [editingItemId, setEditingItemId] = useState(null)
 
   const activeList = useMemo(
     () => lists.find((list) => list.id === activeListId) || null,
@@ -170,6 +171,8 @@ function App() {
   }
 
   const decrementItem = (itemId) => {
+    if (editingItemId) return
+
     const list = lists.find((entry) => entry.id === activeListId)
     const item = list?.items.find((entry) => entry.id === itemId)
     if (!item) return
@@ -349,6 +352,8 @@ function App() {
                 inputMode="numeric"
                 placeholder=""
                 value={item.count === 0 ? '' : item.count}
+                onFocus={() => setEditingItemId(item.id)}
+                onBlur={() => setEditingItemId(null)}
                 onChange={(event) =>
                   handleManualChange(item.id, event.target.value)
                 }
